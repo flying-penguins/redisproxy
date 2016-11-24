@@ -1,0 +1,6 @@
+log_level: 4
+log_file: ./logs/proxyserver.log
+cluster:
+  addr: 0.0.0.0:9601
+  cfg_servers: ['127.0.0.1:19601']
+  max_clients: 20480

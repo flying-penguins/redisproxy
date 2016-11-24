@@ -1,0 +1,18 @@
+log_level: 4
+log_file: ./logs/configserver.log
+cluster:
+  addr: 0.0.0.0:19601
+  cfg_servers: [""]
+  keepalive_time: 600
+  redis_down_time: 60
+  groups_ver: "1111"
+  groups:
+  - slots: [0, 340]
+    master: 0.0.0.0:9001
+    migrate: ""
+  - slots: [341, 680]
+    master: 0.0.0.0:9002
+    migrate: ""
+  - slots: [681, 1023]
+    master: 0.0.0.0:9003
+    migrate: ""
