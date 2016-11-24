@@ -15,7 +15,7 @@
 RedisProxy 是一套基于GO语言实现的Redis分布式解决方案, 对于使用方来说, 使用RedisProxy 与使用原生的 RedisServer 没有区别 (有些Redis原生命令在RedisProxy 作为命令黑名单不予支持), 上层应用可以像使用单机的 Redis 一样使用多个Redis服务器；RedisProxy会处理请求的转发, 在线扩容、缩容, 以及Redis服务器的主备故障切换等工作, 对于客户端来说是完全透明的。设计原则是尽量精简、高效简洁；便于部署运维。
 ## 系统设计及工作流程
 RedisProxy 作为一套分布式系统，由一个配置节点、多个访问代理节点、以及一系列redis主备服务器组成，配置节点我们称其为config-server，访问代理节点为proxy-server，一套redis主备服务器为一个redis-group。
-![RedisProxy系统框架图](https://github.com/flying-penguins/redisproxy/master/doc/20161114145802859.png)
+![RedisProxy系统框架图](https://github.com/flying-penguins/redisproxy/raw/master/doc/20161114145802859.png)
 
  - config-server： 负责管理所有redis-server，维护proxy-server的路由分发规则，以及定时收集proxy-server的状态、统计信息等。从架构上看，config-server类似于传统系统的中心节点，但实际上对于RedisProxy 这套系统来说是非常轻量级的，客户端的请求是完全不经过config-server的；就算config-server挂掉在路由规则无变化的情况下不影响系统提供正常服务，换句话说在config-server挂掉的同时redis-server也有挂掉，才会影响部分请求。我们还提供主备模式的部署，主备之间通过keepalive探测对方的状态，进行状态切换【部署主备个人感觉没多大必要，尽量在硬件上面做好隔离比较好】。
  - proxy-server： 实现了redis协议提供客户端的访问功能；每个客户端连接上来会开一个协程专门处理，获取请求校验命令合法后，根据KEY路由到相应的后端redis服务器进行执行；proxy-server跟后端redis的一个数据库一条TCP连接，通过pipeline模式与redis交互。
